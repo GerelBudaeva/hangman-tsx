@@ -14,10 +14,13 @@ function App() {
 
     const incorrectLetters = guessLetters.filter(letter => !wordGuess.includes(letter))
 
+    const isLoser = incorrectLetters.length >= 6;
+    const isWinner = wordGuess.split('').every(letter => guessLetters.includes(letter))
+
     const addGuessLetter = useCallback((letter: string) => {
-        if (guessLetters.includes(letter))
-            setGuessLetters(currentLetters => [...currentLetters, letter])
-    }, [guessLetters])
+        if (guessLetters.includes(letter) || isWinner || isLoser) return
+        setGuessLetters(currentLetters => [...currentLetters, letter])
+    }, [guessLetters || isWinner || isLoser])
 
     //     function addGuessLetter(letter: string) {
     //     if (guessLetters.includes(letter)) return
@@ -49,11 +52,16 @@ function App() {
             <div style={{
                 fontSize: "2rem", textAlign: "center"
             }}>
+                {isWinner && "Congratulation!"}
+                {isLoser && "Try again!"}
             </div>
+
             <Hangman numberOfGuesses={incorrectLetters.length}/>
             <Word
                 guessLetters={guessLetters}
-                wordGuess={wordGuess}/>
+                wordGuess={wordGuess}
+                reveal={isLoser}
+            />
 
             <div style={{alignSelf: "stretch"}}>
 
@@ -61,6 +69,7 @@ function App() {
                     activeLetters={guessLetters.filter(letter => wordGuess.includes(letter))}
                     inactiveLetters={incorrectLetters}
                     addGuessLetter={addGuessLetter}
+                    disabled={isWinner || isLoser}
                 />
             </div>
         </div>
